@@ -186,7 +186,8 @@ impl Queue {
         let u32_size = mem::size_of::<T>();
         assert_eq!(ptr.size % u32_size as u32, 0);
         let raw = Self::get_raw(data, ptr);
-        unsafe { slice::from_raw_parts(raw.as_ptr() as *const _, raw.len() / u32_size) }
+        let aligned_offset = raw.as_ptr().align_offset(mem::align_of::<T>());
+        unsafe { slice::from_raw_parts(raw.as_ptr().add(aligned_offset) as *const T, raw.len() / u32_size) }
     }
 
     /// Return a reference to a stored data object.
